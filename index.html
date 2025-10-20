@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCP/IP Model Interactive Learning Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TCP/IP Model Interactive Learning Platform</h1>
+            <p>Explore how data travels through the TCP/IP protocol stack</p>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <!-- Left Side: Controls -->
+            <div class="input-section">
+                <h3>Send a Message/File</h3>
+                <div class="form-group">
+                    <label for="messageType">Message Type:</label>
+                    <select id="messageType">
+                        <option value="email">Email</option>
+                        <option value="http">HTTP Request</option>
+                        <option value="file">File Transfer (FTP)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageInput">Message Content:</label>
+                    <textarea id="messageInput" rows="3" placeholder="Enter your message here...">Hello, this is a test message to demonstrate the TCP/IP model!</textarea>
+                </div>
+
+                <div class="form-group" id="attachmentSection" style="display:none;">
+                    <label for="attachmentSize">Attachment Size (KB):</label>
+                    <input type="number" id="attachmentSize" value="4" min="1" max="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="mssInput">MSS (Maximum Segment Size) - bytes:</label>
+                    <input type="number" id="mssInput" value="1460" min="500" max="9000" step="100">
+                    <small>Typical: 1460 bytes (1500 MTU - 40 bytes headers)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="sourceIP">Source IP:</label>
+                    <input type="text" id="sourceIP" value="192.168.1.100" placeholder="192.168.1.100">
+                </div>
+
+                <div class="form-group">
+                    <label for="destIP">Destination IP:</label>
+                    <input type="text" id="destIP" value="203.0.113.50" placeholder="203.0.113.50">
+                </div>
+
+                <div class="form-group">
+                    <label for="domainName">Domain Name (for DNS lookup):</label>
+                    <input type="text" id="domainName" value="www.example.com" placeholder="www.example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="errorSimulation">Simulate Network Error:</label>
+                    <select id="errorSimulation">
+                        <option value="none">None</option>
+                        <option value="packetLoss">Packet Loss</option>
+                        <option value="delay">Network Delay</option>
+                        <option value="corruption">Data Corruption</option>
+                    </select>
+                </div>
+
+                <button id="startBtn" class="btn-primary">Start Transmission</button>
+                <button id="resetBtn" class="btn-secondary">Reset</button>
+            </div>
+
+            <!-- Right Side: Simulation Area -->
+            <div class="info-panel">
+                <div id="statusInfo">
+                    <p><strong>Current Step:</strong> <span id="currentStep">Idle</span></p>
+                    <p><strong>Segments:</strong> <span id="segmentCount">0</span></p>
+                    <p><strong>Progress:</strong> <span id="progressPercent">0%</span></p>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <!-- Simulation Canvas -->
+                <div class="simulation-canvas">
+                    <!-- DNS Lookup Section -->
+                    <div id="dnsSection" class="section" style="display:none;">
+                        <h2>DNS Lookup</h2>
+                        <div class="dns-visualization">
+                            <div class="dns-query">
+                                <h4>DNS Query</h4>
+                                <p>Domain: <span id="dnsQuery"></span></p>
+                            </div>
+                            <div class="dns-arrow">→</div>
+                            <div class="dns-server">
+                                <h4>DNS Server</h4>
+                                <p>8.8.8.8</p>
+                            </div>
+                            <div class="dns-arrow">→</div>
+                            <div class="dns-response">
+                                <h4>DNS Response</h4>
+                                <p>IP: <span id="dnsResponse"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TCP/IP Layer Visualization -->
+                    <div class="layers-container">
+            
+            <!-- Layer 5: Application Layer -->
+            <div class="layer application-layer" id="layer5">
+                <div class="layer-header">
+                    <h3>5. Application Layer</h3>
+                    <span class="protocol-badge">HTTP | FTP | SMTP | DNS</span>
+                </div>
+                <div class="layer-content">
+                    <div class="layer-info">
+                        <p><strong>Function:</strong> Provides network services to applications</p>
+                        <p><strong>Data Unit:</strong> Message/Data</p>
+                    </div>
+                    <div class="packet-view" id="appData">
+                        <div class="packet-content">Waiting for data...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 4: Transport Layer -->
+            <div class="layer transport-layer" id="layer4">
+                <div class="layer-header">
+                    <h3>4. Transport Layer</h3>
+                    <span class="protocol-badge">TCP | UDP</span>
+                </div>
+                <div class="layer-content">
+                    <div class="layer-info">
+                        <p><strong>Function:</strong> End-to-end communication, segmentation, reliability</p>
+                        <p><strong>Data Unit:</strong> Segment</p>
+                    </div>
+                    
+                    <!-- TCP Handshake -->
+                    <div id="tcpHandshake" class="tcp-handshake" style="display:none;">
+                        <h4>TCP 3-Way Handshake</h4>
+                        <div class="handshake-animation">
+                            <div class="node">Client</div>
+                            <div class="handshake-arrows">
+                                <div class="arrow syn">SYN →</div>
+                                <div class="arrow syn-ack">← SYN-ACK</div>
+                                <div class="arrow ack">ACK →</div>
+                            </div>
+                            <div class="node">Server</div>
+                        </div>
+                    </div>
+
+                    <div class="segments-container" id="segmentsView"></div>
+                    
+                    <!-- TCP Teardown -->
+                    <div id="tcpTeardown" class="tcp-handshake" style="display:none;">
+                        <h4>TCP 4-Way Teardown</h4>
+                        <div class="handshake-animation">
+                            <div class="node">Client</div>
+                            <div class="handshake-arrows">
+                                <div class="arrow fin">FIN →</div>
+                                <div class="arrow ack">← ACK</div>
+                                <div class="arrow fin">← FIN</div>
+                                <div class="arrow ack">ACK →</div>
+                            </div>
+                            <div class="node">Server</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 3: Network Layer -->
+            <div class="layer network-layer" id="layer3">
+                <div class="layer-header">
+                    <h3>3. Network Layer</h3>
+                    <span class="protocol-badge">IP | ICMP | ARP</span>
+                </div>
+                <div class="layer-content">
+                    <div class="layer-info">
+                        <p><strong>Function:</strong> Logical addressing, routing, packet forwarding</p>
+                        <p><strong>Data Unit:</strong> Packet</p>
+                    </div>
+                    <div class="routing-visualization" id="routingView">
+                        <div class="routing-path">
+                            <div class="router-node">Source<br><span id="srcIP"></span></div>
+                            <div class="route-arrow">→</div>
+                            <div class="router-node">Router 1<br>10.0.1.1</div>
+                            <div class="route-arrow">→</div>
+                            <div class="router-node">Router 2<br>10.0.2.1</div>
+                            <div class="route-arrow">→</div>
+                            <div class="router-node">Destination<br><span id="dstIP"></span></div>
+                        </div>
+                    </div>
+                    <div class="packets-container" id="packetsView"></div>
+                </div>
+            </div>
+
+            <!-- Layer 2: Data Link Layer -->
+            <div class="layer datalink-layer" id="layer2">
+                <div class="layer-header">
+                    <h3>2. Data Link Layer</h3>
+                    <span class="protocol-badge">Ethernet | MAC | ARP</span>
+                </div>
+                <div class="layer-content">
+                    <div class="layer-info">
+                        <p><strong>Function:</strong> Physical addressing (MAC), error detection, framing</p>
+                        <p><strong>Data Unit:</strong> Frame</p>
+                    </div>
+                    <div class="frames-container" id="framesView"></div>
+                </div>
+            </div>
+
+            <!-- Layer 1: Physical Layer -->
+            <div class="layer physical-layer" id="layer1">
+                <div class="layer-header">
+                    <h3>1. Physical Layer</h3>
+                    <span class="protocol-badge">Bits | Signals</span>
+                </div>
+                <div class="layer-content">
+                    <div class="layer-info">
+                        <p><strong>Function:</strong> Physical transmission of raw bits</p>
+                        <p><strong>Data Unit:</strong> Bits</p>
+                        <p><strong>Encoding:</strong> Manchester Encoding</p>
+                    </div>
+                    <div class="physical-transmission">
+                        <div class="binary-data" id="binaryData"></div>
+                        <div class="manchester-encoding" id="manchesterSignal">
+                            <canvas id="signalCanvas" width="800" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Control Panel with Simulation Area -->
+
+        <!-- Summary Log -->
+        <div class="log-section">
+            <h2>Transmission Log</h2>
+            <div id="logContainer" class="log-container"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
